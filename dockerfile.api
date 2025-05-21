@@ -1,0 +1,14 @@
+FROM node:20.11.1-alpine
+
+RUN mkdir -p /api
+WORKDIR /
+
+COPY package*.json ./api
+
+COPY . .
+
+RUN npm install
+
+EXPOSE 4322
+
+CMD [ "npm" , "start" ]

@@ -1,0 +1,14 @@
+services:
+  pg_api:
+    container_name: tpso_api
+    restart: always
+    build:
+      context: .
+      dockerfile: ./dockerfile.api
+    ports:
+      - "5622:4322"
+    networks:
+      - theerasan-network
+networks:
+  theerasan-network:
+    driver: bridge
