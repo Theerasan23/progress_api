@@ -20,6 +20,7 @@ const limiter = rateLimit({
   max: 300,
   message: 'มีการร้องขอมากเกินไป โปรดลองใหม่ภายหลัง'
 });
+
 app.use(limiter);
 app.use(cors({
   origin: function (origin, callback) {
@@ -52,9 +53,39 @@ pool.connect()
     console.error('PostgreSQL connection error:', err.stack);
   });
 
-app.get('/get', async (req, res) => {
+
+app.get('/', async (req, res) => {
   try {
     const result = await pool.query('SELECT id, name, total, price, d_buy, d_update FROM public.crypto_buy');
+    res.json(result.rows);
+  } catch (err) {
+    console.error('Error executing query:', err);
+    res.status(500).json({ error: 'Database query error' });
+  }
+});
+
+app.get('/get', async (req, res) => {
+  try {
+
+    const condition = "SELECT id, name, total, price, d_buy, d_update FROM public.crypto_buy";
+
+    const result = await pool.query(condition);
+    res.json(result.rows);
+  } catch (err) {
+    console.error('Error executing query:', err);
+    res.status(500).json({ error: 'Database query error' });
+  }
+});
+
+
+app.post('/get', async (req, res) => {
+  try {
+
+
+    
+    const condition = "SELECT id, name, total, price, d_buy, d_update FROM public.crypto_buy";
+
+    const result = await pool.query(condition);
     res.json(result.rows);
   } catch (err) {
     console.error('Error executing query:', err);
@@ -65,8 +96,13 @@ app.get('/get', async (req, res) => {
 
 app.post('/post', async (req, res) => {
   try {
-    const result = await pool.query('SELECT id, name, total, price, d_buy, d_update FROM public.crypto_buy');
-    res.json(result.rows);
+
+    const { id , name } = req.body;
+    
+
+    const result = await pool.query('SELECT id, name, total, price, d_buy, d_update FROM public.crypto_buy where id=$1  and name=$2',
+      [id,name]);
+    res.status(200).json(result.rows);
   } catch (err) {
     console.error('Error executing query:', err);
     res.status(500).json({ error: 'Database query error' });
